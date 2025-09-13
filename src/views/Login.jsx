@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import "../styles/Login.css"; // Tu CSS adaptado
+import "../styles/Login.css";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginView() {
+  const navigate = useNavigate();
+
   const [showRegister, setShowRegister] = useState(false);
   const [loginPasswordVisible, setLoginPasswordVisible] = useState(false);
   const [registerPasswordVisible, setRegisterPasswordVisible] = useState(false);
@@ -15,24 +18,70 @@ export default function LoginView() {
     if (type === "register") setRegisterPasswordVisible(!registerPasswordVisible);
   };
 
+  // Manejo del Login
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const user = users.find(u => u.email === email && u.password === password);
+
+    if (user) {
+      localStorage.setItem("currentUser", JSON.stringify(user)); // Marca al usuario como autenticado
+      navigate("/dashboard");
+    } else {
+      alert("Correo o contraseña incorrectos");
+    }
+  };
+
+  // Manejo del Registro
+  const handleRegister = (e) => {
+    e.preventDefault();
+    const name = e.target.name.value;
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    const municipio = e.target.municipio.value;
+
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+
+    if (users.find(u => u.email === email)) {
+      alert("Este correo ya está registrado");
+      return;
+    }
+
+    users.push({ name, email, password, municipio });
+    localStorage.setItem("users", JSON.stringify(users));
+
+    alert("Registro exitoso, ahora inicia sesión");
+    setShowRegister(false); // vuelve al login
+  };
+
   return (
     <div className="page">
       <div className={`container ${showRegister ? "show-register" : ""}`}>
-
         {/* Panel lateral Login */}
         <div className="side-panel login-panel">
           <img src="/logo_imagen.png" alt="Logo" className="logo" />
           <h2>¡Hola!</h2>
-          <p>Regístrese con sus datos personales para usar todas las funciones del sitio</p>
-          <button className="toggle-btn" onClick={toggleForms}>Indeloid</button>
+          <p>Regístrate con tus datos personales para usar todas las funciones del sitio</p>
+          <button className="toggle-btn" onClick={toggleForms}>
+            Registrarte
+          </button>
         </div>
 
         {/* Panel lateral Registro */}
         <div className="side-panel register-panel">
-        <img src="/logo_imagen.png" alt="Logo" className="logo" />
+          <img src="/logo_imagen.png" alt="Logo" className="logo" />
           <h2>¡Bienvenido!</h2>
-          <p>Inicie sesión con sus datos para acceder a sus recomendaciones personalizadas</p>
-          <button className="toggle-btn" onClick={toggleForms}>Iniciar Sesión</button>
+          <p>Inicia sesión con tus datos para acceder a tus recomendaciones personalizadas</p>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setShowRegister(false)}
+          >
+            Iniciar Sesión
+          </button>
         </div>
 
         {/* Formulario Login */}
@@ -41,7 +90,7 @@ export default function LoginView() {
             <h1>Iniciar Sesión</h1>
             <p>Accede a tu cuenta para ver tus recomendaciones</p>
           </div>
-          <form>
+          <form onSubmit={handleLogin}>
             <div className="form-group">
               <input type="email" name="email" placeholder="Correo electrónico" required />
             </div>
@@ -50,6 +99,7 @@ export default function LoginView() {
                 type={loginPasswordVisible ? "text" : "password"}
                 name="password"
                 placeholder="Contraseña"
+                required
               />
               <button
                 type="button"
@@ -69,7 +119,7 @@ export default function LoginView() {
             <h1>Crear Cuenta</h1>
             <p>Comienza a recibir recomendaciones para tu jardín</p>
           </div>
-          <form>
+          <form onSubmit={handleRegister}>
             <div className="form-group">
               <input type="text" name="name" placeholder="Nombre" required />
             </div>
@@ -81,6 +131,7 @@ export default function LoginView() {
                 type={registerPasswordVisible ? "text" : "password"}
                 name="password"
                 placeholder="Contraseña"
+                required
               />
               <button
                 type="button"
@@ -91,19 +142,20 @@ export default function LoginView() {
               </button>
             </div>
             <div className="form-group">
-              <select name="municipio" required>
-                <option value="" disabled selected hidden>Selecciona un municipio</option>
+              <select name="municipio" required defaultValue="">
+                <option value="" disabled hidden>
+                  Selecciona un municipio
+                </option>
                 <option value="Alegría">Alegría</option>
                 <option value="Berlín">Berlín</option>
                 <option value="California">California</option>
                 {/* Completa los demás municipios aquí */}
               </select>
             </div>
-            <p className="note">Podés personalizar más tus recomendaciones después</p>
-            <button type="submit" className="btn">Indeloid</button>
+            <p className="note">Podrás personalizar más tus recomendaciones después</p>
+            <button type="submit" className="btn">Registrate</button>
           </form>
         </div>
-
       </div>
     </div>
   );

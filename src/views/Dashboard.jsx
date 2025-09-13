@@ -3,7 +3,7 @@ import "../styles/dashboard.css"; // CSS adaptado
 
 export default function Dashboard({ userName }) {
   const redirectToStart = () => {
-    window.location.href = "/"; 
+    window.location.href = "/inicio"; 
   };
 
   return (

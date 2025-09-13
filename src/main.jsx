@@ -1,7 +1,7 @@
 // src/main.jsx
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
 
 // Views existentes
@@ -16,21 +16,28 @@ import Resultados from "./views/Resultados";
 import DetallePlanta from "./views/DetallePlanta";
 import ConfiguracionPreferencias from "./views/ConfiguracionPreferencias";
 
+// Componente para proteger rutas
+const ProtectedRoute = ({ children }) => {
+  const user = JSON.parse(localStorage.getItem("currentUser"));
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+};
+
 const router = createBrowserRouter([
+  { path: "/", element: <Navigate to="/login" replace /> }, // redirige al login por defecto
   {
     path: "/",
-    element: <Layout />,  
+    element: <Layout />,
     children: [
-      { path: "/", element: <Inicio /> },
-      { path: "/perfil", element: <Perfil /> },
-      { path: "/favoritos", element: <Favoritos /> },
-      { path: "/dashboard", element: <Dashboard /> },
-      { path: "/resultados", element: <Resultados /> },
-      { path: "/planta/:id", element: <DetallePlanta /> }, 
-      { path: "/preferencias", element: <ConfiguracionPreferencias /> },
+      { path: "/inicio", element: <ProtectedRoute><Inicio /></ProtectedRoute> },
+      { path: "/perfil", element: <ProtectedRoute><Perfil /></ProtectedRoute> },
+      { path: "/favoritos", element: <ProtectedRoute><Favoritos /></ProtectedRoute> },
+      { path: "/dashboard", element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
+      { path: "/resultados", element: <ProtectedRoute><Resultados /></ProtectedRoute> },
+      { path: "/planta/:id", element: <ProtectedRoute><DetallePlanta /></ProtectedRoute> },
+      { path: "/preferencias", element: <ProtectedRoute><ConfiguracionPreferencias /></ProtectedRoute> },
     ],
   },
-  // Rutas sin Navbar
   { path: "/login", element: <Login /> },
 ]);
 
