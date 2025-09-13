@@ -1,7 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom"; // <-- Importar
 import "../styles/Resultados.css";
 
 export default function Resultados() {
+  const navigate = useNavigate(); // <-- Hook de navegación
+
   // Datos simulados de plantas
   const plantas = [
     {
@@ -37,48 +40,54 @@ export default function Resultados() {
     alert(`Planta ${plantaId} añadida a favoritos (simulado)`);
   };
 
+  const verDetalle = (plantaId) => {
+    navigate(`/planta/${plantaId}`); // <-- Redirige al detalle de la planta
+  };
+
   return (
+    <main className="resultados-main">
+      <h1>Recomendaciones de Plantas</h1>
+      <p className="info-text">
+        Estas son las plantas que mejor se adaptan a tus preferencias de jardín.
+      </p>
 
-      <main className="resultados-main">
-        <h1>Recomendaciones de Plantas</h1>
-        <p className="info-text">
-          Estas son las plantas que mejor se adaptan a tus preferencias de jardín.
-        </p>
-
-        <div className="plant-grid">
-          {plantas.map((planta) => (
-            <div className="plant-card" key={planta.id}>
-              <div className="plant-image">
-                <img
-                  src={planta.imagen}
-                  alt={planta.nombre}
-                  width="300"
-                  height="160"
-                />
+      <div className="plant-grid">
+        {plantas.map((planta) => (
+          <div className="plant-card" key={planta.id}>
+            <div 
+              className="plant-image" 
+              onClick={() => verDetalle(planta.id)} // <-- click en la imagen
+              style={{ cursor: "pointer" }}
+            >
+              <img
+                src={planta.imagen}
+                alt={planta.nombre}
+                width="300"
+                height="160"
+              />
+            </div>
+            <div className="plant-info" onClick={() => verDetalle(planta.id)} style={{ cursor: "pointer" }}>
+              <div className="plant-name">{planta.nombre}</div>
+              <div className="plant-scientific">
+                <em>{planta.nombre_cientifico}</em>
               </div>
-              <div className="plant-info">
-                <div className="plant-name">{planta.nombre}</div>
-                <div className="plant-scientific">
-                  <em>{planta.nombre_cientifico}</em>
-                </div>
-                <div className="plant-tags">
-                  <span className="plant-tag">{planta.exposicion_luz}</span>
-                  <span className="plant-tag">{planta.tipo_suelo}</span>
-                  <span className="plant-tag">{planta.frecuencia_agua} agua</span>
-                </div>
-              </div>
-              <div className="favorito-wrapper">
-                <button
-                  className="btn-favorito"
-                  onClick={() => agregarFavorito(planta.id)}
-                >
-                  ❤️
-                </button>
+              <div className="plant-tags">
+                <span className="plant-tag">{planta.exposicion_luz}</span>
+                <span className="plant-tag">{planta.tipo_suelo}</span>
+                <span className="plant-tag">{planta.frecuencia_agua} agua</span>
               </div>
             </div>
-          ))}
-        </div>
-      </main>
- 
+            <div className="favorito-wrapper">
+              <button
+                className="btn-favorito"
+                onClick={() => agregarFavorito(planta.id)}
+              >
+                ❤️
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </main>
   );
 }

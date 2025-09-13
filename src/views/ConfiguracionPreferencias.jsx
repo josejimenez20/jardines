@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import "../styles/configuracionPreferencias.css"; // CSS separado
+import { useNavigate } from "react-router-dom"; // <-- Importar
+import "../styles/configuracionPreferencias.css"; 
 
 export default function ConfiguracionPreferencias() {
+  const navigate = useNavigate(); // <-- Hook de navegación
+
   const [answers, setAnswers] = useState({
     frecuencia_agua: "",
     tipo_suelo: "",
@@ -43,7 +46,7 @@ export default function ConfiguracionPreferencias() {
   const handleSubmit = (e) => {
     e.preventDefault();
     alert("Tus preferencias fueron guardadas correctamente!");
-    // Aquí podrías redirigir si quieres
+    navigate("/resultados"); // <-- Redirección
   };
 
   return (
