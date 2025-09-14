@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 // src/main.jsx
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -15,10 +16,11 @@ import Dashboard from "./views/Dashboard";
 import Resultados from "./views/Resultados";
 import DetallePlanta from "./views/DetallePlanta";
 import ConfiguracionPreferencias from "./views/ConfiguracionPreferencias";
+import { AuthContextProvider, useAuth } from "./contexts/useAuth";
 
 // Componente para proteger rutas
 const ProtectedRoute = ({ children }) => {
-  const user = JSON.parse(localStorage.getItem("currentUser"));
+  const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
   return children;
 };
@@ -43,6 +45,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthContextProvider>
+      <RouterProvider router={router} />
+    </AuthContextProvider>
   </React.StrictMode>
 );
