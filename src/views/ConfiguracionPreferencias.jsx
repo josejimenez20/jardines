@@ -1,22 +1,21 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // <-- Importar
-import "../styles/configuracionPreferencias.css"; 
+import { useNavigate, createSearchParams } from "react-router-dom";
+import "../styles/configuracionPreferencias.css";
 
 export default function ConfiguracionPreferencias() {
-  const navigate = useNavigate(); // <-- Hook de navegación
+  const navigate = useNavigate();
 
   const [answers, setAnswers] = useState({
     frecuencia_agua: "",
     tipo_suelo: "",
     exposicion_luz: "",
-    tamano_espacio: "",
   });
 
   const questions = [
     {
       key: "frecuencia_agua",
       text: "¿Con qué frecuencia riegas tu jardín?",
-      options: ["Mucho", "Regular", "Poco", "Nunca"],
+      options: ["Bajo", "Moderado", "Alto", "Nunca"],
     },
     {
       key: "tipo_suelo",
@@ -26,17 +25,12 @@ export default function ConfiguracionPreferencias() {
     {
       key: "exposicion_luz",
       text: "¿Cuánta luz solar recibe tu jardín?",
-      options: ["Sombra", "Semi sombra", "Sol pleno"],
-    },
-    {
-      key: "tamano_espacio",
-      text: "¿Tamaño de espacio?",
-      options: ["Pequeño 10m²", "Mediano 20-50m²", "Grande 50-100m²"],
+      options: ["Sombra", "Sombra parcial", "Sol pleno"],
     },
   ];
 
   const handleSelect = (questionKey, value) => {
-    setAnswers(prev => ({ ...prev, [questionKey]: value }));
+    setAnswers((prev) => ({ ...prev, [questionKey]: value }));
   };
 
   const completedCount = Object.values(answers).filter(Boolean).length;
@@ -45,8 +39,12 @@ export default function ConfiguracionPreferencias() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Tus preferencias fueron guardadas correctamente!");
-    navigate("/resultados"); // <-- Redirección
+
+    // Redirigir a /resultados con los filtros como query params
+    navigate({
+      pathname: "/resultados",
+      search: `?${createSearchParams(answers)}`,
+    });
   };
 
   return (
@@ -56,7 +54,9 @@ export default function ConfiguracionPreferencias() {
         Responde todas las preguntas para recibir recomendaciones personalizadas.
       </p>
 
-      <div id="progressText">{completedCount} de {totalQuestions} preguntas completadas</div>
+      <div id="progressText">
+        {completedCount} de {totalQuestions} preguntas completadas
+      </div>
 
       <form onSubmit={handleSubmit}>
         {questions.map((q) => (

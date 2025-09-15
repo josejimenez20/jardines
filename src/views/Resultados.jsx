@@ -1,49 +1,32 @@
-import React from "react";
-import { useNavigate } from "react-router-dom"; // <-- Importar
+import React, { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom"; // <-- Importar
 import "../styles/Resultados.css";
+import { usePlanta } from "../contexts/usePlanta";
 
 export default function Resultados() {
-  const navigate = useNavigate(); // <-- Hook de navegación
+  const navigate = useNavigate();
+  const { filterPlanta, filterPlant } = usePlanta();
+  const [searchParams] = useSearchParams();
 
-  // Datos simulados de plantas
-  const plantas = [
-    {
-      id: 1,
-      nombre: "Rosa",
-      nombre_cientifico: "Rosa indica",
-      imagen: "/img/rosa.jpg",
-      exposicion_luz: "Sol pleno",
-      tipo_suelo: "Fértil",
-      frecuencia_agua: "Media",
-    },
-    {
-      id: 2,
-      nombre: "Lavanda",
-      nombre_cientifico: "Lavandula",
-      imagen: "/img/lavanda.jpg",
-      exposicion_luz: "Semi sombra",
-      tipo_suelo: "Arenoso",
-      frecuencia_agua: "Baja",
-    },
-    {
-      id: 3,
-      nombre: "Tulipán",
-      nombre_cientifico: "Tulipa",
-      imagen: "/img/tulipan.jpg",
-      exposicion_luz: "Sol pleno",
-      tipo_suelo: "Arcilloso",
-      frecuencia_agua: "Media",
-    },
-  ];
+  // Leer los filtros desde los query params
+  const filters = {
+    frecuencia_agua: searchParams.get("frecuencia_agua") || "",
+    tipo_suelo: searchParams.get("tipo_suelo") || "",
+    exposicion_luz: searchParams.get("exposicion_luz") || "",
+    tamano_espacio: searchParams.get("tamano_espacio") || "",
+  };
+
+  useEffect(() => {
+    filterPlant(filters); // Ejecuta la búsqueda al cargar la página
+  }, [searchParams]);
 
   const agregarFavorito = (plantaId) => {
     alert(`Planta ${plantaId} añadida a favoritos (simulado)`);
   };
 
   const verDetalle = (plantaId) => {
-    navigate(`/planta/${plantaId}`); // <-- Redirige al detalle de la planta
+    navigate(`/planta/${plantaId}`);
   };
-
   return (
     <main className="resultados-main">
       <h1>Recomendaciones de Plantas</h1>
@@ -52,7 +35,15 @@ export default function Resultados() {
       </p>
 
       <div className="plant-grid">
-        {plantas.map((planta) => (
+        
+        {
+          filterPlanta?.data?.length === 0 && (
+            <p>No se encontraron plantas que coincidan con los filtros seleccionados.</p>
+          )
+        }
+
+        {
+          filterPlanta?.data?.map((planta) => (
           <div className="plant-card" key={planta.id}>
             <div 
               className="plant-image" 
