@@ -1,14 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/Login.css";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/useAuth";
+import api from "../shared/api";
 
 export default function LoginView() {
+  const [municipios, setMunicipios] = useState([]);
   const navigate = useNavigate();
+  const { login, register } = useAuth();
 
   const [showRegister, setShowRegister] = useState(false);
   const [loginPasswordVisible, setLoginPasswordVisible] = useState(false);
   const [registerPasswordVisible, setRegisterPasswordVisible] = useState(false);
 
+
+  useEffect(() => {
+    const fetchMunicipios = async () => {
+      try {
+        const response = await api.get("/municipio");
+        setMunicipios(response.data);
+      } catch (error) {
+        console.error("Error fetching municipios:", error);
+      }
+    };
+    fetchMunicipios();
+  }, []);
   // Alterna entre Login y Registro
   const toggleForms = () => setShowRegister(!showRegister);
 
@@ -19,41 +35,34 @@ export default function LoginView() {
   };
 
   // Manejo del Login
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const user = users.find(u => u.email === email && u.password === password);
-
-    if (user) {
-      localStorage.setItem("currentUser", JSON.stringify(user)); // Marca al usuario como autenticado
-      navigate("/dashboard");
-    } else {
-      alert("Correo o contraseña incorrectos");
+    try {
+      const response = await login({ email, password });
+      if (response.message ) {
+        navigate("/dashboard");
+      } else {
+        alert("Error en el inicio de sesión. Revisa tus credenciales.");
+      }
+    } catch (err) {
+      console.error("Error en login:", err);
+      alert("Hubo un problema al iniciar sesión.");
     }
   };
 
   // Manejo del Registro
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     const name = e.target.name.value;
     const email = e.target.email.value;
     const password = e.target.password.value;
     const municipio = e.target.municipio.value;
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-
-    if (users.find(u => u.email === email)) {
-      alert("Este correo ya está registrado");
-      return;
-    }
-
-    users.push({ name, email, password, municipio });
-    localStorage.setItem("users", JSON.stringify(users));
-
-    alert("Registro exitoso, ahora inicia sesión");
+    const newUser = { name, email, password, municipio };
+    await register(newUser);
     setShowRegister(false); // vuelve al login
   };
 
@@ -146,10 +155,11 @@ export default function LoginView() {
                 <option value="" disabled hidden>
                   Selecciona un municipio
                 </option>
-                <option value="Alegría">Alegría</option>
-                <option value="Berlín">Berlín</option>
-                <option value="California">California</option>
-                {/* Completa los demás municipios aquí */}
+                {
+                  municipios.map(mun => (
+                    <option key={mun._id} value={mun._id}>{mun.name}</option>
+                  ))
+               }
               </select>
             </div>
             <p className="note">Podrás personalizar más tus recomendaciones después</p>
