@@ -42,7 +42,7 @@ export default function LoginView() {
 
     try {
       const response = await login({ email, password });
-      if (response.message ) {
+      if (response) {
         navigate("/dashboard");
       } else {
         alert("Error en el inicio de sesión. Revisa tus credenciales.");
